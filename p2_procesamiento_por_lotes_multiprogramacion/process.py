@@ -1,13 +1,13 @@
+import random
 class Process:
     def __init__(self, id, username, num_1, num_2, operation, result, math_exp, operator, exe_time):
         self.id = id
-        self.username = username
-        self.num_1 = num_1
-        self.num_2 = num_2
-        self.operation = operation
-        self.result = operation
+        self.num_1 = random.randint(0,20)
+        self.num_2 = random.randint(0,20)
+        self.operation = random.choice(['+', '-', '*', '/', '%'])
+        self.result = result
         self.math_exp = math_exp
-        self.exe_time = exe_time
+        self.exe_time = random.randint(5, 18)
 
     def input_empty(self):
         return self.id == '' or self.username == '' or self.operation == '' or self.result == '' or self.exe_time == ''
@@ -56,37 +56,26 @@ class Process:
 
     def set_result(self):
         match self.operation:
-            case 1:
+            case "+":
                 self.result = self.num_1 + self.num_2
-                self.operator = "+"
-
-            case 2:
+            case "-":
                 self.result = self.num_1 - self.num_2
-                self.operator = "-"
-
-            case 3:
+            case "*":
                 self.result = self.num_1 * self.num_2
-                self.operator = "*"
-
-            case 4 | 5:
+            case "/" | "%":
                 if self.num_2 != 0:
                     match self.operation:
-
-                        case 4:
+                        case "/":
                             self.result = float(self.num_1) / float(self.num_2)
-                            self.operator = "/"
-
-                        case 5:
-                            self.result = float(self.num_1) % float(self.num_2)
-                            self.operator = "%"
+                        case "%":
+                            self.result = float(self.num_1) % float(self.num_2)                          
                 else:
                     print("Indeterminacy error: not possible to divide by 0")
-
             case _:
                 print("Invalid Operation. Try Again.")
 
     def set_math_exp(self):
-        self.math_exp = str(self.num_1) + self.operator + str(self.num_2)
+        self.math_exp = str(self.num_1) + self.operation + str(self.num_2)
 
     def get_math_exp(self):
         return self.math_exp
