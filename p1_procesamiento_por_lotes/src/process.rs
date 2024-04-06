@@ -3,7 +3,7 @@ use crate::reg_cal;
 use regex::Regex;
 use std::io::{self}; // Importing io and Write trait
 
-#[derive(Default, Debug)]
+#[derive(Default, Debug, Clone)]
 pub struct Process {
     id: String,
     username: String,

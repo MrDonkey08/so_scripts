@@ -2,7 +2,6 @@ mod process;
 mod screen;
 mod reg_cal;
 
-use rand::Rng;
 use std::io:: {self, Write};
 use std::time:: {Instant};
 use std:: {thread, time}; // For system sleep
@@ -29,8 +28,8 @@ fn main() {
             Ok(num) => num,
             Err(_) => {
                 println!("Invalid input. Please, enter a valid integer");
-                screen::sys_pause();
-                screen::sys_clear();
+                screen::pause();
+                screen::clear();
                 continue; // Continue to the next iteration of the loop
             }
         };
@@ -44,11 +43,11 @@ fn main() {
     println!("Bacth: {batches}");
 
     let mut processes : Vec<process::Process> = Vec::new();
+    let mut p_time : u64 = 0;
 
     for n in 0..int_num_process {
-        processes.push(process::Process::new(String::from(""), String::from(""), String::from(""), String::from(""), 0));
+        processes.push(process::Process::new(String::from(""), String::from(""), String::from(""), String::from(""), 3));
 
-        let mut used_id = false;
         let mut seted_exe_time = false;
 
         loop {
@@ -62,7 +61,6 @@ fn main() {
                 for m in 0..n {
                     if n > 0 && processes[n].get_id() == processes[m].get_id() {
                         println!("ID already used. Try again");
-                        used_id = true;
                         processes[n].set_id_empty();
                         break;
                     }
@@ -79,13 +77,13 @@ fn main() {
                 io::stdin()
                     .read_line(&mut aux)
                     .expect("Failed to read number");
-        
+
                 int_aux = match aux.trim().parse() {
                     Ok(num) => num,
                     Err(_) => {
                         println!("Invalid input. Please, enter a valid integer");
-                        screen::sys_pause();
-                        screen::sys_clear();
+                        screen::pause();
+                        screen::clear();
                         continue;
                     }
                 };
@@ -112,110 +110,118 @@ fn main() {
 
             if processes[n].input_empty() {
                 println!("Empty field detected. Please try again.");
-                screen::sys_pause();
-                screen::sys_clear();
+                screen::pause();
+                screen::clear();
                 continue; // Continue to the next iteration of the loop
             }
 
-            processes[n].set_exe_time(rand::thread_rng().gen_range(2..=5));
+            //processes[n].set_exe_time(rand::thread_rng().gen_range(2..=5));
             break;
-        }
+        }*/
+
+        p_time += processes[n].get_exe_time()
     }
 
-    screen::sys_pause();
-    screen::sys_clear();
+    screen::pause();
+    screen::clear();
 
-    let mut time: Vec<u64> = Vec::new();
-    let mut j = 0; // int_num_process index
-    let mut k = 0; // 
-    let mut l = 0; // index for run batches
-    let mut m = batches-1; // descending index
-    let mut n = LOTE-1;
-    let mut lote = LOTE;
+    let mut execution : Vec<process::Process> = Vec::new();
+    let mut finished : Vec<process::Process> = Vec::new();
 
-    for i in 0..int_num_process {
-        time.push(0);
-    }
-
+    let mut p_end;
 
     for i in 0..batches {
-        
-        if m == 0 {
-            lote = batches_res;
+        let p_beg = i * LOTE;
+
+        if i == batches - 1 && batches_res > 0 {
+            p_end = p_beg + batches_res;
+        } else {
+            p_end = p_beg + LOTE;
         }
 
-        for j in k..lote+k {
-            time[i] += processes[j].get_exe_time();
-            working_batch(&time, batches, i);
-            for k in (n..=0).rev() {
-                batch_in_exe(&mut processes, k);
+        let mut n = 0; // Processes counter (lenght) in execution vector
+        let mut time_left : u64 = 0; //
+        let mut time_elapsed : u64 = 0;
+
+        for j in p_beg..p_end {
+            execution.push(processes[j].clone());
+            time_left += execution[n].get_exe_time();
+            n += 1;
+        }
+
+        // Process printing
+        for (j, exe) in execution.iter().enumerate() {
+            screen::clear();
+            // Batch in execution
+            h_line_1();
+            batch_in_exe(i, batches, time_left - time_elapsed);
+            time_elapsed += execution[j].get_exe_time();
+            finished.push(execution[j].clone());
+
+            // Process of batch in execution
+            for k in j..n {
+                process_in_exe(execution[k].get_id(), execution[k].get_exe_time());
             }
-            h_line();
 
-            working_processes(&mut processes, &mut time, i, j);
-            h_line();
+            h_line_1();
+            // Process in execution
+            current_process(exe, time_elapsed, time_left - time_elapsed);
 
-            for l in 0..i {
-                if i % 4 == 0 {
-                    finished_batch(batches, i);
+            // Process executed/finished
+            for (k, fin) in finished.iter().enumerate() {
+                if (k) % 4 == 0 {
+                    h_line_1();
+                    finished_batch((k) / 4, batches);
+                    h_line_2();
                 }
-                finished_processes(&processes, j);
+                finished_processes(fin);
             }
 
-            h_line();
-            screen::sys_pause();
-            screen::sys_clear();
-
+            h_line_1();
+            screen::pause(); 
         }
 
-        if m > 0 {
-            m -= 1;
-        }
-
-        if n > 0 {
-            n -= 1;
-        }
-
-
+        execution.clear(); // empty the vector
     }
 
     let duration = start.elapsed();
-    h_line();
+    h_line_1();
+    println!("Processes Execution Time: {} s", p_time);
     println!("Program Execution Time: {:?}", duration);
 }
 
-fn h_line(){
-    println!("---------------------");
+fn h_line_1(){
+    println!("------------------------------");
 }
 
-fn working_batch(times: &Vec<u64>, batches : usize, i : usize) {
+fn h_line_2(){
+    println!("----------------");
+}
+
+fn batch_in_exe(i : usize, batches : usize, time : u64) {
     println!("Batch in execution: {} de {}\n", i+1, batches);
-    println!("Estimated execution time {}s\n\n", times[i]);
+    println!("Estimated execution time {} s\n", time);
 }
 
-fn batch_in_exe(arr: &Vec<process::Process>, j : usize){
-    println!("Program (ID): {}", arr[j].get_id());
-    println!("Estimated execution time {}s", (arr[j].get_exe_time()));
+fn process_in_exe(id : &str, time : u64) {
+    println!("Program (ID): {}", id);
+    println!("Estimated execution time {} s\n", time);
 }
 
-fn finished_batch(batches : usize, i : usize) {
+fn finished_batch(i : usize, batches : usize) {
     println!("Batch: {} de {}\n", i+1, batches);
 }
 
-fn finished_processes(arr : &Vec<process::Process>, j : usize) {
-    println!("Nombre: {}", arr[j].get_username());
-    println!("Operation: {} = {}\n\n", arr[j].get_math_exp(), arr[j].get_ans_exp());
+fn finished_processes(p : &process::Process) {
+    println!("Nombre: {}", p.get_username());
+    println!("Operation: {} = {}\n", p.get_math_exp(), p.get_ans_exp());
 }
 
-fn working_processes(arr : &mut Vec<process::Process>, times : &mut Vec<u64>, i : usize, j : usize) {
-    let start = Instant::now();
-    arr[j].calculate_ans_exp();
-    println!("Program (ID): {}", arr[j].get_id());
-    println!("Nombre: {}", arr[j].get_username());
-    println!("Operation: {} = {}", arr[j].get_math_exp(), arr[j].get_ans_exp());
-    thread::sleep(time::Duration::from_secs(arr[j].get_exe_time()-1));
-    let duration = start.elapsed();
-    times[i] -= arr[j].get_exe_time();
-    println!("Time elapsed: {:?}", duration);
-    println!("Time left: {}s\n\n", times[i]);
+fn current_process(p : &process::Process, mut time_1 : u64, mut time_2 : u64) {
+    println!("Program (ID): {}", p.get_id());
+    println!("Nombre: {}", p.get_username());
+    println!("Operation: {} = {}", p.get_math_exp(), p.get_ans_exp());
+    thread::sleep(time::Duration::from_secs(p.get_exe_time()));
+    println!("Time elapsed: {} s", time_1);
+    println!("Time left: {} s\n", time_2);
 }
