@@ -53,7 +53,7 @@ fn main() {
         loop {
             println!("Process: {} of {}", n+1, num_process);
 
-            if processes[n].get_id().is_empty() {
+            while processes[n].get_id().is_empty() {
                 print!("ID: ");
                 io::stdout().flush().expect("Failed to flush stdout");
                 processes[n].set_id();
@@ -67,7 +67,7 @@ fn main() {
                 }
             }
 
-            if  !seted_exe_time {
+            while !seted_exe_time {
                 let int_aux;
 
                 print!("Estimated execution time: ");
@@ -82,8 +82,6 @@ fn main() {
                     Ok(num) => num,
                     Err(_) => {
                         println!("Invalid input. Please, enter a valid integer");
-                        screen::pause();
-                        screen::clear();
                         continue;
                     }
                 };
@@ -91,13 +89,13 @@ fn main() {
                 seted_exe_time = true;
             }
 
-            if processes[n].get_username().is_empty() {
+            while processes[n].get_username().is_empty() {
                 print!("Programmer name: ");
                 io::stdout().flush().expect("Failed to flush stdout");
                 processes[n].set_username();
             }
 
-            if processes[n].get_math_exp().is_empty() {
+            while processes[n].get_math_exp().is_empty() {
                 print!("Math Expression: ");
                 io::stdout().flush().expect("Failed to flush stdout");
                 processes[n].set_math_exp();
@@ -117,7 +115,7 @@ fn main() {
 
             //processes[n].set_exe_time(rand::thread_rng().gen_range(2..=5));
             break;
-        }*/
+        }
 
         p_time += processes[n].get_exe_time()
     }
