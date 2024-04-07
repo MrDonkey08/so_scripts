@@ -40,7 +40,9 @@ fn main() {
     let batches_cos : usize = int_num_process / LOTE;
     let batches : usize = batches_cos + if batches_res != 0 { 1 } else { 0 };
 
-    println!("Bacth: {batches}");
+    h_line_1();
+    println!("Bacthes: {batches}\n");
+    h_line_1();
 
     let mut processes : Vec<process::Process> = Vec::new();
     let mut p_time : u64 = 0;
@@ -117,6 +119,7 @@ fn main() {
             break;
         }
 
+        h_line_1();
         p_time += processes[n].get_exe_time()
     }
 
@@ -151,7 +154,6 @@ fn main() {
         for (j, exe) in execution.iter().enumerate() {
             screen::clear();
             // Batch in execution
-            h_line_1();
             batch_in_exe(i, batches, time_left - time_elapsed);
             time_elapsed += execution[j].get_exe_time();
             finished.push(execution[j].clone());
@@ -161,11 +163,15 @@ fn main() {
                 process_in_exe(execution[k].get_id(), execution[k].get_exe_time());
             }
 
-            h_line_1();
             // Process in execution
+            h_line_1();
+            println!("Process in execution:");
+            h_line_1();
             current_process(exe, time_elapsed, time_left - time_elapsed);
 
             // Process executed/finished
+            h_line_1();
+            println!("Processes finished");
             for (k, fin) in finished.iter().enumerate() {
                 if (k) % 4 == 0 {
                     h_line_1();
@@ -197,17 +203,19 @@ fn h_line_2(){
 }
 
 fn batch_in_exe(i : usize, batches : usize, time : u64) {
-    println!("Batch in execution: {} de {}\n", i+1, batches);
-    println!("Estimated execution time {} s\n", time);
+    h_line_1();
+    println!("Batch in execution: {} of {}", i+1, batches);
+    println!("Estimated execution time: {} s", time);
+    h_line_1();
 }
 
 fn process_in_exe(id : &str, time : u64) {
     println!("Program (ID): {}", id);
-    println!("Estimated execution time {} s\n", time);
+    println!("Estimated execution time: {} s\n", time);
 }
 
 fn finished_batch(i : usize, batches : usize) {
-    println!("Batch: {} de {}\n", i+1, batches);
+    println!("Batch: {} of {}", i+1, batches);
 }
 
 fn finished_processes(p : &process::Process) {
@@ -215,10 +223,10 @@ fn finished_processes(p : &process::Process) {
     println!("Operation: {} = {}\n", p.get_math_exp(), p.get_ans_exp());
 }
 
-fn current_process(p : &process::Process, mut time_1 : u64, mut time_2 : u64) {
+fn current_process(p : &process::Process, time_1 : u64, time_2 : u64) {
     println!("Program (ID): {}", p.get_id());
     println!("Nombre: {}", p.get_username());
-    println!("Operation: {} = {}", p.get_math_exp(), p.get_ans_exp());
+    println!("Operation: {}", p.get_math_exp());
     thread::sleep(time::Duration::from_secs(p.get_exe_time()));
     println!("Time elapsed: {} s", time_1);
     println!("Time left: {} s\n", time_2);
