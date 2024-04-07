@@ -116,7 +116,7 @@ fn main() {
 
     let duration = start.elapsed();
     h_line_1();
-    println!("Processes Execution Time: {} s", process::Process::get_p_exe_time());
+    println!("Processes Execution Time: {} s", unsafe { *process::Process::get_p_exe_time() });
     println!("Program Execution Time: {:?}", duration);
 }
 

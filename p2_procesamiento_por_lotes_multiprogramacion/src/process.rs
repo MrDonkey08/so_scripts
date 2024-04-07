@@ -1,4 +1,5 @@
 use rand::Rng;
+use std::ptr::addr_of;
 
 static mut P_EXE_TIME: u8 = 0;
 
@@ -52,8 +53,8 @@ impl Process {
     }
 
     fn gen_number_2(&mut self) {
-        let rng = rand::thread_rng();
-        self.num_2 = rand::thread_rng().gen_range(0..=100);
+        let mut rng = rand::thread_rng();
+        self.num_2 = rng.gen_range(0..=100);
     }
 
     fn gen_math_exp(&mut self) {
@@ -88,5 +89,5 @@ impl Process {
     pub fn get_math_exp(&self) -> &String { &self.math_exp }
     pub fn get_result(&self) -> &f32 { &self.result }
     pub fn get_exe_time(&self) -> &u8 { &self.exe_time }
-    pub fn get_p_exe_time() -> &'static u8 { unsafe { &P_EXE_TIME } }
+    pub fn get_p_exe_time() -> *const u8 { unsafe { addr_of!(P_EXE_TIME) } }
 }
