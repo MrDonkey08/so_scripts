@@ -48,9 +48,7 @@ fn main() {
     let mut p_time : u64 = 0;
 
     for n in 0..int_num_process {
-        processes.push(process::Process::new(String::from(""), String::from(""), String::from(""), String::from(""), 3));
-
-        let mut seted_exe_time = false;
+        processes.push(process::Process::new(String::from(""), String::from(""), String::from(""), String::from(""), 0));
 
         loop {
             println!("Process: {} of {}", n+1, num_process);
@@ -69,7 +67,7 @@ fn main() {
                 }
             }
 
-            while !seted_exe_time {
+            while processes[n].get_exe_time() <= 0 {
                 let int_aux;
 
                 print!("Estimated execution time: ");
@@ -83,12 +81,11 @@ fn main() {
                 int_aux = match aux.trim().parse() {
                     Ok(num) => num,
                     Err(_) => {
-                        println!("Invalid input. Please, enter a valid integer");
+                        println!("Invalid input. Please, enter a valid positive integer");
                         continue;
                     }
                 };
                 processes[n].set_exe_time(int_aux);
-                seted_exe_time = true;
             }
 
             while processes[n].get_username().is_empty() {
