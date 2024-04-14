@@ -1,5 +1,6 @@
 mod process;
 mod screen;
+mod kb;
 
 use std::io:: {self, Write};
 use std::time:: {Instant};
@@ -8,6 +9,8 @@ use std:: {thread, time}; // For system sleep
 const BATCH: usize = 4;
 
 fn main() {
+    screen::clear();
+    kb::bind();
     let start = Instant::now();
 
     let num_process: usize;
