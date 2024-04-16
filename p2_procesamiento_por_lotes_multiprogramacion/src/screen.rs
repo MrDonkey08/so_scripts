@@ -1,7 +1,7 @@
 use std::process::Command;
 use std::io::{self, stdout, Write};
-use termion::cursor::{Goto, Hide, Show};
-use termion::raw::IntoRawMode;
+use termion::{cursor::DetectCursorPos, cursor::Goto, clear::CurrentLine};
+
 
 pub fn clear() {
     if cfg!(target_os = "windows") {
@@ -18,21 +18,20 @@ pub fn pause() {
 }
 
 pub fn print_xy(x: u16, y: u16, text: &str) {
-    // Get stdout and enter raw mode
-    let mut stdout = stdout().into_raw_mode().unwrap();
+    // Get stdout
+    let mut stdout = stdout();
 
-    // Hide the cursor
-    write!(stdout, "{}", Hide).unwrap();
+    // Save the current cursor position
+    let (saved_x, saved_y) = stdout.cursor_pos().unwrap();
 
-    // Save current cursor position
-    write!(stdout, "{}", Goto(x, y)).unwrap();
+    // Move cursor to the specified position and print the text
+    write!(stdout, "{}{}", Goto(x, y), text).unwrap();
 
-    // Print the text at the specified position
-    write!(stdout, "{}", text).unwrap();
+    // Clear the rest of the line after the printed text
+    write!(stdout, "{}{}", Goto(0, y + 1), CurrentLine).unwrap();
 
-    // Restore cursor to previous position
-    write!(stdout, "{}", Goto(x, y + 1)).unwrap(); // Move cursor one line down
-    write!(stdout, "{}", Show).unwrap(); // Show the cursor again
+    // Restore cursor to the saved position
+    write!(stdout, "{}{}", Goto(saved_x, saved_y), termion::cursor::Show).unwrap();
 
     // Flush the output
     stdout.flush().unwrap();
