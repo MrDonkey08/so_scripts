@@ -2,15 +2,14 @@ mod process;
 mod screen;
 mod kb;
 
-use std::io:: {self, Write};
-use std::time:: {Instant};
-use std:: {thread, time}; // For system sleep
+use std::io::{self, Write};
+use std::time::{Duration, Instant};
+use std::thread; // For system sleep
 
 const BATCH: usize = 4;
 
 fn main() {
     screen::clear();
-    kb::bind();
     let start = Instant::now();
 
     let num_process: usize;
@@ -48,7 +47,7 @@ fn main() {
 
     let mut processes: Vec<process::Process> = Vec::new();
 
-    for n in 0..num_process {
+    for _ in 0..num_process {
         processes.push(process::Process::new());
     }
 
@@ -154,7 +153,10 @@ fn finished_processes(p: &process::Process) {
 fn current_process(p: &process::Process, time_1: u8, time_2: u8) {
     println!("Program (ID): {}", p.get_id());
     println!("Operation: {}", p.get_math_exp());
-    thread::sleep(time::Duration::from_secs(*p.get_exe_time() as u64));
+
+    kb::bind();
+    thread::sleep(Duration::from_secs(*p.get_exe_time() as u64));
+
     println!("Time elapsed: {} s", time_1);
     println!("Time left: {} s\n", time_2);
 }

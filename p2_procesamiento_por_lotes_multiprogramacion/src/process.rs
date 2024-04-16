@@ -83,9 +83,9 @@ impl Process {
     // Getters
 
     pub fn get_id(&self) -> &u16 { &self.id }
-    pub fn get_num_1(&self) -> &u32 { &self.num_1 }
-    pub fn get_num_2(&self) -> &u32 { &self.num_2 }
-    pub fn get_operation(&self) -> &char { &self.operation }
+    pub fn _get_num_1(&self) -> &u32 { &self.num_1 }
+    pub fn _get_num_2(&self) -> &u32 { &self.num_2 }
+    pub fn _get_operation(&self) -> &char { &self.operation }
     pub fn get_math_exp(&self) -> &String { &self.math_exp }
     pub fn get_result(&self) -> &f32 { &self.result }
     pub fn get_exe_time(&self) -> &u8 { &self.exe_time }

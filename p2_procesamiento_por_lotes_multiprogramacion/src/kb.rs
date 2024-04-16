@@ -1,7 +1,8 @@
 use crate::screen;
 
-use std::io::{self, Read,Write};
-use std::{thread, time}; // For system sleep
+use std::io::{self, Write};
+use std::time::Duration;
+use std::thread; // For system sleep
 use termion::event::Key;
 use termion::input::TermRead;
 use termion::raw::IntoRawMode; // Import IntoRawMode trait
@@ -21,13 +22,13 @@ pub fn bind() {
             if paused {
                 if let Key::Char('c') = key {
                     print_status("Continue");
-                } else {
-                    continue;
-                }
+                    break;
+                } else { continue; }
             } else {
                 match key {
                     Key::Char('p') => {
                         print_status("Paused");
+                        
                         paused = true;
                         continue;
                     }
@@ -37,6 +38,7 @@ pub fn bind() {
                     Key::Char('e') => {
                         print_status("Interruption");
                     }
+                    Key::Char('x') => {}
                     _ => { continue; }
                 }
             }
@@ -55,7 +57,7 @@ fn print_status(text: &str) {
 
     if text != "Paused" {
         let spaces: String = " ".repeat(text.len());
-        thread::sleep(time::Duration::from_secs(1));
+        thread::sleep(Duration::from_secs(1));
         screen::print_xy(x_top_right, 1, &spaces);
     }
 }
