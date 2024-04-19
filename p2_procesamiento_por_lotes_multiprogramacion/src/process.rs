@@ -10,7 +10,7 @@ pub struct Process {
     num_2: u32,
     operation: char,
     math_exp: String,
-    result: f32,
+    result: String,
     exe_time: u8,
 }
 
@@ -32,7 +32,7 @@ impl Process {
                 _ => unreachable!(),
             },
             math_exp: String::new(),
-            result: 0.0,
+            result: String::new(),
             exe_time: rng.gen_range(1..=2),
         };
 
@@ -68,14 +68,14 @@ impl Process {
         }
 
         self.result = match self.operation {
-            '+' => (self.num_1 + self.num_2) as f32,
-            '-' => self.num_1 as f32 - self.num_2 as f32,
-            '*' => (self.num_1 * self.num_2) as f32,
-            '/' =>  self.num_1 as f32 / self.num_2 as f32,
-            '%' =>  self.num_1 as f32 % self.num_2 as f32,
+            '+' => ((self.num_1 + self.num_2) as f32).to_string(),
+            '-' => (self.num_1 as f32 - self.num_2 as f32).to_string(),
+            '*' => ((self.num_1 * self.num_2) as f32).to_string(),
+            '/' => (self.num_1 as f32 / self.num_2 as f32).to_string(),
+            '%' => (self.num_1 as f32 % self.num_2 as f32).to_string(),
             _ => {
                 println!("Invalid operation. Try again");
-                f32::NAN
+                (f32::NAN).to_string()
             }
         };
     }
@@ -87,7 +87,13 @@ impl Process {
     pub fn _get_num_2(&self) -> &u32 { &self.num_2 }
     pub fn _get_operation(&self) -> &char { &self.operation }
     pub fn get_math_exp(&self) -> &String { &self.math_exp }
-    pub fn get_result(&self) -> &f32 { &self.result }
+    pub fn get_result(&self) -> &String { &self.result }
     pub fn get_exe_time(&self) -> &u8 { &self.exe_time }
     pub fn get_p_exe_time() -> *const u8 { unsafe { addr_of!(P_EXE_TIME) } }
+
+    // Setters
+
+    pub fn set_result(&mut self, res: &str) {
+        self.result = res.to_string();
+    }
 }

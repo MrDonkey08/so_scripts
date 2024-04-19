@@ -8,11 +8,11 @@ use termion::input::TermRead;
 use termion::raw::IntoRawMode; // Import IntoRawMode trait
 use termion::terminal_size;
 
-pub fn bind() {
+pub fn bind() -> char {
     let stdin = io::stdin();
     let mut stdout = io::stdout().into_raw_mode().unwrap();
     let mut keys = stdin.keys();
-
+    let mut key_char = '\0';
     let mut paused = false;
 
     loop {
@@ -22,21 +22,24 @@ pub fn bind() {
             if paused {
                 if let Key::Char('c') = key {
                     print_status("Continue");
+                    key_char = 'c';
                     break;
                 } else { continue; }
             } else {
                 match key {
                     Key::Char('p') => {
                         print_status("Paused");
-                        
+                        key_char = 'p';
                         paused = true;
                         continue;
                     }
                     Key::Char('w') => {
                         print_status("Error");
+                        key_char = 'w';
                     }
                     Key::Char('e') => {
                         print_status("Interruption");
+                        key_char = 'e';
                     }
                     Key::Char('x') => {}
                     _ => { continue; }
@@ -48,6 +51,7 @@ pub fn bind() {
 
     }
     stdout.flush().unwrap();
+    key_char
 }
 
 fn print_status(text: &str) {

@@ -10,8 +10,8 @@ const BATCH: usize = 4;
 
 fn main() {
     screen::clear();
-    let start = Instant::now();
 
+    let start = Instant::now();
     let num_process: usize;
 
     loop {
@@ -58,6 +58,8 @@ fn main() {
     let mut finished: Vec<process::Process> = Vec::new();
 
     let mut p_end;
+    let mut removed = false;
+    let mut j;
 
     for i in 0..batches {
         let p_beg = i * BATCH;
@@ -78,8 +80,11 @@ fn main() {
             n += 1;
         }
 
+        j = 0;
+        let exe_len = execution.len();
+
         // Process printing
-        for (j, exe) in execution.iter().enumerate() {
+        while j < exe_len {
             screen::clear();
             // Batch in execution
             batch_in_exe(i, batches, time_left - time_elapsed);
@@ -95,7 +100,36 @@ fn main() {
             h_line_1();
             println!("Process in execution:");
             h_line_1();
-            current_process(exe, time_elapsed, time_left - time_elapsed);
+            current_process(&execution[j]);
+
+            let key = kb::bind();
+
+            match key {
+                'w' => {
+                    execution[j].set_result("Error");
+                    finished[p_beg + j].set_result("Error");
+                },
+                'e' => {
+                    time_elapsed -= execution[j].get_exe_time();
+
+                    execution.splice(exe_len..exe_len , vec![execution[j].clone()]);
+                    execution.remove(j);
+
+                    finished.remove(j);
+                    removed = true;
+                },
+                _ => thread::sleep(Duration::from_secs(*execution[j].get_exe_time() as u64)), // case 'c' too
+            }
+
+            if removed {
+                removed = false;
+                continue;
+            }
+
+            j += 1;
+
+
+            current_process_times(time_elapsed, time_left - time_elapsed);
 
             // Process executed/finished
             h_line_1();
@@ -150,13 +184,12 @@ fn finished_processes(p: &process::Process) {
     println!("Operation: {} = {}\n", p.get_math_exp(), p.get_result());
 }
 
-fn current_process(p: &process::Process, time_1: u8, time_2: u8) {
+fn current_process(p: &process::Process) {
     println!("Program (ID): {}", p.get_id());
     println!("Operation: {}", p.get_math_exp());
+}
 
-    kb::bind();
-    thread::sleep(Duration::from_secs(*p.get_exe_time() as u64));
-
+fn current_process_times(time_1: u8, time_2: u8){
     println!("Time elapsed: {} s", time_1);
     println!("Time left: {} s\n", time_2);
 }
