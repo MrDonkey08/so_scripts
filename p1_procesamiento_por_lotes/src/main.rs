@@ -3,8 +3,8 @@ mod screen;
 mod reg_cal;
 
 use std::io:: {self, Write};
-use std::time:: {Instant};
-use std:: {thread, time}; // For system sleep
+use std::time::Instant;
+use std::{thread, time}; // For system sleep
 
 const LOTE: usize = 4;
 
@@ -67,9 +67,7 @@ fn main() {
                 }
             }
 
-            while processes[n].get_exe_time() <= 0 {
-                let int_aux;
-
+            while processes[n].get_exe_time() == 0 {
                 print!("Estimated execution time: ");
                 io::stdout().flush().expect("Failed to flush stdout");
                 let mut aux = String::new();
@@ -78,7 +76,7 @@ fn main() {
                     .read_line(&mut aux)
                     .expect("Failed to read number");
 
-                int_aux = match aux.trim().parse() {
+                let int_aux = match aux.trim().parse() {
                     Ok(num) => num,
                     Err(_) => {
                         println!("Invalid input. Please, enter a valid positive integer");
@@ -156,7 +154,7 @@ fn main() {
             finished.push(execution[j].clone());
 
             // Process of batch in execution
-            for k in j..n {
+            for k in j+1..n {
                 process_in_exe(execution[k].get_id(), execution[k].get_exe_time());
             }
 

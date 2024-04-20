@@ -91,7 +91,7 @@ fn main() {
 
             // Process of batch in execution
             println!("ID\tMax Estimated Time");
-            for k in j..n {
+            for k in j+1..n {
                 process_in_exe(execution[k].get_id(), execution[k].get_exe_time());
             }
 
@@ -115,7 +115,7 @@ fn main() {
                     execution.splice(exe_len..exe_len , vec![execution[j].clone()]);
                     execution.remove(j);
 
-                    finished.remove(j);
+                    finished.remove(p_beg + j);
                     continue;
                 },
                 _ => thread::sleep(Duration::from_secs(*execution[j].get_exe_time() as u64)), // case 'c' too

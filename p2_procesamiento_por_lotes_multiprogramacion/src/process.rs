@@ -33,7 +33,7 @@ impl Process {
             },
             math_exp: String::new(),
             result: String::new(),
-            exe_time: rng.gen_range(1..=2),
+            exe_time: rng.gen_range(5..=18),
         };
 
         unsafe { P_EXE_TIME += process.get_exe_time(); }
