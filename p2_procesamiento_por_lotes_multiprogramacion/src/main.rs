@@ -41,11 +41,14 @@ fn main() {
     let batches_cos: usize = num_process / BATCH;
     let batches: usize = batches_cos + if batches_res != 0 { 1 } else { 0 };
 
-    h_line_1();
+    h_line(30);
     println!("Bacthes: {batches}\n");
-    h_line_1();
+    h_line(30);
+
 
     let mut processes: Vec<process::Process> = Vec::new();
+    let mut execution: Vec<process::Process> = Vec::new();
+    let mut finished: Vec<process::Process> = Vec::new();
 
     for _ in 0..num_process {
         processes.push(process::Process::new());
@@ -54,12 +57,7 @@ fn main() {
     screen::pause();
     screen::clear();
 
-    let mut execution: Vec<process::Process> = Vec::new();
-    let mut finished: Vec<process::Process> = Vec::new();
-
     let mut p_end;
-    let mut removed = false;
-    let mut j;
 
     for i in 0..batches {
         let p_beg = i * BATCH;
@@ -80,7 +78,7 @@ fn main() {
             n += 1;
         }
 
-        j = 0;
+        let mut j = 0;
         let exe_len = execution.len();
 
         // Process printing
@@ -92,14 +90,16 @@ fn main() {
             finished.push(execution[j].clone());
 
             // Process of batch in execution
+            println!("ID\tMax Estimated Time");
             for k in j..n {
                 process_in_exe(execution[k].get_id(), execution[k].get_exe_time());
             }
 
             // Process in execution
-            h_line_1();
+            h_line(55);
             println!("Process in execution:");
-            h_line_1();
+            h_line(55);
+            println!("ID\tOperation\tElapsed Time\tBath Time Left");
             current_process(&execution[j]);
 
             let key = kb::bind();
@@ -116,34 +116,29 @@ fn main() {
                     execution.remove(j);
 
                     finished.remove(j);
-                    removed = true;
+                    continue;
                 },
                 _ => thread::sleep(Duration::from_secs(*execution[j].get_exe_time() as u64)), // case 'c' too
             }
 
-            if removed {
-                removed = false;
-                continue;
-            }
-
             j += 1;
-
 
             current_process_times(time_elapsed, time_left - time_elapsed);
 
             // Process executed/finished
-            h_line_1();
+            h_line(55);
             println!("Processes finished");
             for (k, fin) in finished.iter().enumerate() {
                 if (k) % 4 == 0 {
-                    h_line_1();
+                    h_line(35);
                     finished_batch((k) / 4, batches);
-                    h_line_2();
+                    h_line(35);
+                    println!("ID\tOperation\tResult");
                 }
                 finished_processes(fin);
             }
 
-            h_line_1();
+            h_line(35);
             screen::pause(); 
         }
 
@@ -151,29 +146,27 @@ fn main() {
     }
 
     let duration = start.elapsed();
-    h_line_1();
+    h_line(35);
     println!("Processes Execution Time: {} s", unsafe { *process::Process::get_p_exe_time() });
     println!("Program Execution Time: {:?}", duration);
 }
 
-fn h_line_1(){
-    println!("------------------------------");
-}
-
-fn h_line_2(){
-    println!("----------------");
+fn h_line(times: usize){
+    for _ in 0..times {
+        print!("-");
+    }
+    println!();
 }
 
 fn batch_in_exe(i: usize, batches: usize, time: u8) {
-    h_line_1();
+    h_line(30);
     println!("Batch in execution: {} of {}", i+1, batches);
     println!("Estimated execution time: {} s", time);
-    h_line_1();
+    h_line(30);
 }
 
 fn process_in_exe(id: &u16, time: &u8) {
-    println!("Program (ID): {}", id);
-    println!("Estimated execution time: {} s\n", time);
+    println!("{}\t{}", id, time);
 }
 
 fn finished_batch(i: usize, batches: usize) {
@@ -181,15 +174,14 @@ fn finished_batch(i: usize, batches: usize) {
 }
 
 fn finished_processes(p: &process::Process) {
-    println!("Operation: {} = {}\n", p.get_math_exp(), p.get_result());
+    println!("{}\t{}\t\t{}", p.get_id(), p.get_math_exp(), p.get_result());
 }
 
 fn current_process(p: &process::Process) {
-    println!("Program (ID): {}", p.get_id());
-    println!("Operation: {}", p.get_math_exp());
+    print!("{}\t{}", p.get_id(), p.get_math_exp());
+    io::stdout().flush().expect("Failed to flush stdout");
 }
 
 fn current_process_times(time_1: u8, time_2: u8){
-    println!("Time elapsed: {} s", time_1);
-    println!("Time left: {} s\n", time_2);
+    println!("\t\t{} s\t\t{} s", time_1, time_2);
 }
