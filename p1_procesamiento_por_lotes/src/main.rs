@@ -9,6 +9,7 @@ use std::{thread, time}; // For system sleep
 const LOTE: usize = 4;
 
 fn main() {
+    screen::clear();
     let start = Instant::now();
 
     let mut num_process;

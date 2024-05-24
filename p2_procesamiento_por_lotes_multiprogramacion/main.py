@@ -28,7 +28,6 @@ def main():
     execution: List[Process] = []
     finished: List[Process] = []
 
-    screen.pause()
     screen.clear()
 
     s_start_time = time.time()
